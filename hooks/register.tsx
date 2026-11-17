@@ -2,9 +2,8 @@ import type { Register, ThemeSetArgs } from 'claude-code'
 
 import { makeColors } from './make-colors.js'
 
-// Claudo: realistic deep space, dark. A black hole bends the light of its own
-// accretion disk over and under its shadow, among nebulae with dark dust lanes
-// in a dense, fine starfield. Light mode is the same sky seen from the top of the
+// Claudo: realistic deep space, dark. Nebulae with dark dust lanes in a dense,
+// fine starfield. Light mode is the same sky seen from the top of the
 // atmosphere, fading through its blue glow into the page; dark mode is near
 // black. All of it lives in the top third and the very edges.
 const { theme, problems } = makeColors({
@@ -127,9 +126,6 @@ function flareStars(count: number): string {
   while (placed < count) {
     const x = rand() * 1600
     const y = 12 + rand() * 360
-    if (Math.abs(x - 800) < 280 && y < 270) {
-      continue // keep clear of the black hole
-    }
     const big = placed % 3 === 0
     const s = big ? 1 + rand() * 0.5 : 0.55 + rand() * 0.4
     const glow = pick(['sgw', 'sgw', 'sgy', 'sgo'])
@@ -153,40 +149,6 @@ function galaxy(x: number, y: number, rot: number, s: number): string {
   <ellipse rx="40" ry="1.6" cy="1.8" class="lane"/></g>`
 }
 
-// The black hole's disk: many thin rings, hottest and brightest inside, and
-// brighter on the left, the side turning toward us.
-function disk(): string {
-  let out = ''
-  for (let i = 0; i < 24; i++) {
-    const t = i / 23
-    const rx = 72 + t * 180
-    const w = 1 + (1 - t) * 2.6 + rand() * 1.1
-    const o = (1 - t * 0.7) * (0.55 + rand() * 0.45)
-    const grad = t < 0.25 ? 'dh' : t < 0.6 ? 'dm' : 'dc'
-    out += `<ellipse rx="${d(rx)}" ry="${d(rx * 0.11)}" stroke="url(#${grad})" stroke-width="${d(w)}" opacity="${o.toFixed(2)}"/>`
-  }
-  out += '<ellipse class="flow" rx="200" ry="22" stroke-width="1.6" stroke-dasharray="60 40 20 90"/>'
-  out += '<ellipse class="flow fl2" rx="140" ry="15.4" stroke-width="1.4" stroke-dasharray="60 40 20 90"/>'
-  out += '<ellipse class="flow fl3" rx="96" ry="10.6" stroke-width="1.2" stroke-dasharray="60 40 20 90"/>'
-  return out
-}
-
-function blackHole(): string {
-  const dk = disk()
-  return `<ellipse class="bhbreathe" rx="330" ry="150" fill="url(#bhhalo)"/>
-  <ellipse rx="150" ry="112" fill="url(#bhinner)"/>
-  <g class="dsk">${dk}</g>
-  ${hotSpot(false)}${hotSpot(false, 150, 9, 4.5)}
-  <ellipse class="lens" rx="108" ry="96" stroke-width="3" opacity=".35"/>
-  <ellipse class="lens" rx="95" ry="85" stroke-width="11" opacity=".85"/>
-  <ellipse class="lens" rx="84" ry="76" stroke-width="3.5"/>
-  <ellipse class="pring2" rx="71" ry="69" stroke-width=".7"/>
-  <circle class="pring" r="66.5" stroke-width="1.6"/>
-  <circle class="shadow" r="64"/>
-  <g class="dsk" clip-path="url(#bhfront)">${dk}</g>
-  ${hotSpot(true)}${hotSpot(true, 150, 9, 4.5)}`
-}
-
 // A young cluster still wrapped in the nebula it was born from.
 function youngStars(): string {
   let out = ''
@@ -194,18 +156,6 @@ function youngStars(): string {
     out += `<circle cx="${n(300 + g() * 110)}" cy="${n(140 + g() * 45)}" r="${(0.5 + rand() * 0.9).toFixed(2)}" opacity="${(0.5 + rand() * 0.5).toFixed(2)}"/>`
   }
   return `<g class="sb">${out}</g>`
-}
-
-// A bright clump of gas riding the inner disk: seen in front on the near half,
-// hidden behind the shadow on the far half.
-function hotSpot(front: boolean, rx = 112, dur = 6, begin = 0): string {
-  const ry = rx * 0.11
-  const path = `M${rx} 0 A${rx} ${ry} 0 0 1 ${-rx} 0 A${rx} ${ry} 0 0 1 ${rx} 0`
-  return `<g class="orbit"><g opacity="${front ? 1 : 0}">
-    <animate attributeName="opacity" values="${front ? '1;0' : '0;1'}" keyTimes="0;0.5" dur="${dur}s" begin="-${begin}s" calcMode="discrete" repeatCount="indefinite"/>
-    <animateMotion path="${path}" dur="${dur}s" begin="-${begin}s" repeatCount="indefinite"/>
-    <ellipse rx="12" ry="3.2" fill="url(#spotg)"/><ellipse rx="3" ry="1" class="score"/>
-  </g></g>`
 }
 
 function meteors(): string {
@@ -245,21 +195,12 @@ const SCENE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
   <radialGradient id="sgo"><stop offset="0" stop-color="#ffe0c4" stop-opacity=".95"/><stop offset=".18" stop-color="#ffb47a" stop-opacity=".3"/><stop offset="1" stop-color="#ffb47a" stop-opacity="0"/></radialGradient>
   <radialGradient id="gxd"><stop offset="0" stop-color="#dfe4ff" stop-opacity=".45"/><stop offset="1" stop-color="#dfe4ff" stop-opacity="0"/></radialGradient>
   <radialGradient id="gxc"><stop offset="0" stop-color="#fff6e2" stop-opacity=".95"/><stop offset="1" stop-color="#fff6e2" stop-opacity="0"/></radialGradient>
-  <radialGradient id="bhhalo"><stop offset="0" stop-color="#ffb46a" stop-opacity=".32"/><stop offset=".4" stop-color="#d06a3a" stop-opacity=".12"/><stop offset="1" stop-color="#7a2e2a" stop-opacity="0"/></radialGradient>
-  <radialGradient id="bhinner"><stop offset=".5" stop-color="#ffcf96" stop-opacity=".35"/><stop offset="1" stop-color="#ffcf96" stop-opacity="0"/></radialGradient>
-  <linearGradient id="dh" x1="-260" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fffaf0"/><stop offset=".5" stop-color="#ffe6bc" stop-opacity=".9"/><stop offset="1" stop-color="#ffcf96" stop-opacity=".5"/></linearGradient>
-  <linearGradient id="dm" x1="-260" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#ffdcaa"/><stop offset=".5" stop-color="#ff9f52" stop-opacity=".8"/><stop offset="1" stop-color="#d0642c" stop-opacity=".4"/></linearGradient>
-  <linearGradient id="dc" x1="-260" y1="0" x2="260" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#f09050"/><stop offset=".5" stop-color="#b8522a" stop-opacity=".7"/><stop offset="1" stop-color="#6e2618" stop-opacity=".35"/></linearGradient>
-  <linearGradient id="lensg" x1="0" y1="-100" x2="0" y2="100" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff2d8"/><stop offset=".3" stop-color="#ffbf7a" stop-opacity=".55"/><stop offset=".5" stop-color="#ffbf7a" stop-opacity="0"/><stop offset=".7" stop-color="#ffbf7a" stop-opacity=".35"/><stop offset="1" stop-color="#ffe2b8" stop-opacity=".75"/></linearGradient>
   <linearGradient id="metg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity="0"/><stop offset="1" stop-color="#ffffff" stop-opacity=".9"/></linearGradient>
   <linearGradient id="airg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fd0c4" stop-opacity="0"/><stop offset=".55" stop-color="#6fd0c4" stop-opacity=".28"/><stop offset="1" stop-color="#6fd0c4" stop-opacity="0"/></linearGradient>
   <radialGradient id="sung"><stop offset="0" stop-color="#fff3dc" stop-opacity=".22"/><stop offset=".35" stop-color="#ffd9a8" stop-opacity=".07"/><stop offset="1" stop-color="#ffd9a8" stop-opacity="0"/></radialGradient>
-  <radialGradient id="spotg"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".4" stop-color="#ffe6bc" stop-opacity=".5"/><stop offset="1" stop-color="#ffbf7a" stop-opacity="0"/></radialGradient>
-  <linearGradient id="pringg" x1="-70" y1="0" x2="70" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fffaf0"/><stop offset=".5" stop-color="#fff0d8" stop-opacity=".8"/><stop offset="1" stop-color="#ffd8a8" stop-opacity=".4"/></linearGradient>
   <linearGradient id="iontail" x1="0" y1="0" x2="236" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#bcd8ff" stop-opacity=".75"/><stop offset="1" stop-color="#bcd8ff" stop-opacity="0"/></linearGradient>
   <linearGradient id="dusttail" x1="0" y1="0" x2="220" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff0d6" stop-opacity="1"/><stop offset="1" stop-color="#fff0d6" stop-opacity="0"/></linearGradient>
   <radialGradient id="coma"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".3" stop-color="#dbe8ff" stop-opacity=".35"/><stop offset="1" stop-color="#dbe8ff" stop-opacity="0"/></radialGradient>
-  <clipPath id="bhfront"><rect x="-300" y="0" width="600" height="60"/></clipPath>
 </defs>
 <style>
   /* Light: the same sky from the top of the atmosphere, fading through its glow. */
@@ -270,11 +211,6 @@ const SCENE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
   .sw{fill:#ffffff}.sb{fill:#cddaff}.sy{fill:#fff0d2}.so{fill:#ffcfa6}
   .spk{fill:#ffffff;opacity:.5}.score{fill:#ffffff}
   .lane{fill:#000000;opacity:.35}
-  .dsk ellipse{fill:none}
-  .flow{stroke:#fff4e0;opacity:.22}
-  .lens{fill:none;stroke:url(#lensg)}
-  .pring{fill:none;stroke:url(#pringg);opacity:.9}.pring2{fill:none;stroke:#fff3dc;opacity:.45}
-  .shadow{fill:#000000}
   .airglow{fill:url(#airg)}
   .satdot{fill:#ffffff}
 
@@ -287,12 +223,6 @@ const SCENE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
   @keyframes btw{0%,100%{transform:scale(.94);opacity:.85}50%{transform:scale(1.06);opacity:1}}
   .nebula{animation:neb 120s ease-in-out infinite}
   @keyframes neb{0%,100%{transform:translate(0,0)}50%{transform:translate(16px,-5px)}}
-  .bhbreathe{transform-box:fill-box;transform-origin:center;animation:breathe 9s ease-in-out infinite}
-  @keyframes breathe{0%,100%{opacity:.8;transform:scale(.97)}50%{opacity:1;transform:scale(1.04)}}
-  .flow{animation:flow 10s linear infinite}.fl2{animation-duration:6.5s}.fl3{animation-duration:4s}
-  @keyframes flow{to{stroke-dashoffset:-840}}
-  .pring{animation:pring 4s ease-in-out infinite alternate}
-  @keyframes pring{from{opacity:.65}to{opacity:1}}
   .meteor{opacity:0;animation:meteor 23s linear infinite}
   @keyframes meteor{0%{opacity:0;transform:translate(0,0)}1%{opacity:1}5%{opacity:0;transform:translate(420px,128px)}100%{opacity:0;transform:translate(420px,128px)}}
   .cdrift{animation:cdrift 160s ease-in-out infinite alternate}
@@ -312,15 +242,10 @@ const SCENE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
     .mk1{stop-opacity:1}.mk2{stop-opacity:.6}
     .airglow{display:none}
   }
-  /* Narrower boxes crop the sides: shrink the black hole so its disk stays in view. */
-  .bhw{transform-origin:800px 150px}
-  @media (max-aspect-ratio: 11/10){.bhw{transform:scale(.85)}.comet{display:none}}
-  @media (max-aspect-ratio: 17/20){.bhw{transform:scale(.72)}}
-  @media (max-aspect-ratio: 3/5){.bhw{transform:scale(.6)}}
   @media (prefers-reduced-motion: reduce){
-    .tw,.btw,.nebula,.bhbreathe,.flow,.pring,.meteor,.satp,.satdot,.cdrift,.drift,.nbr,.flare{animation:none}
+    .tw,.btw,.nebula,.meteor,.satp,.satdot,.cdrift,.drift,.nbr,.flare{animation:none}
     .flare{opacity:.7}
-    .meteor,.sat,.orbit{display:none}
+    .meteor,.sat{display:none}
   }
 </style>
 <rect width="1600" height="1000" fill="url(#sky)"/>
@@ -355,7 +280,6 @@ const SCENE = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" p
 </g>
 ${brightStar(250, 128, 1, 'sgw', 0)}${brightStar(512, 214, 0.7, 'sgy', 1)}${brightStar(1100, 210, 0.85, 'sgw', 2)}${brightStar(90, 300, 0.6, 'sgo', 3)}${brightStar(1240, 30, 0.55, 'sgy', 4)}${brightStar(690, 30, 0.5, 'sgw', 5)}
 <g class="sat"><g transform="translate(-40 96)"><g class="satp"><circle class="satdot" r="1.3"/></g></g></g>
-<g class="bhw"><g transform="translate(800 150) rotate(-6)">${blackHole()}</g></g>
 </svg>`
 
 const LOOK: ThemeSetArgs = {
@@ -389,7 +313,7 @@ export const register: Register = on => {
     return (
       <Svg
         source={SCENE}
-        alt="Realistic deep space along the top: a black hole whose glowing accretion disk bends over and under its shadow, nebulae with dark dust lanes and a young star cluster, a comet with two tails, a dense field of stars, the odd meteor and a satellite passing"
+        alt="Realistic deep space along the top: colorful nebulae with dark dust lanes and a young star cluster, a comet with two tails, a dense field of stars, the odd meteor and a satellite passing"
         isInteractive
       />
     )

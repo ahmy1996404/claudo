@@ -1,10 +1,10 @@
 {
   "name": "claudo",
-  "version": "2.4.0",
-  "description": "Realistic deep space theme for the Claude desktop and mobile apps: a black hole with a lensed accretion disk among colorful nebulae, a dense starfield and stars that glow and fade, in near-black.",
+  "version": "2.5.0",
+  "description": "Realistic deep space theme for the Claude desktop and mobile apps: colorful nebulae with dark dust lanes, a comet and a dense starfield where stars glow and fade, in near-black.",
   "author": { "name": "ahmy1996404", "url": "https://github.com/ahmy1996404" },
   "homepage": "https://github.com/ahmy1996404/claudo",
   "repository": "https://github.com/ahmy1996404/claudo",
   "license": "MIT",
-  "keywords": ["theme", "look", "backdrop", "space", "black-hole", "dark"]
+  "keywords": ["theme", "look", "backdrop", "space", "nebula", "dark"]
 }
