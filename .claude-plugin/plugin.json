@@ -1,0 +1,10 @@
+{
+  "name": "claudo",
+  "version": "0.9.0",
+  "description": "Cozy rainy cafe theme for the Claude desktop and mobile apps: a rain-streaked window over a city in a storm, a warm lamp, a steaming mug and a sleeping cat.",
+  "author": { "name": "ahmy1996404", "url": "https://github.com/ahmy1996404" },
+  "homepage": "https://github.com/ahmy1996404/claudo",
+  "repository": "https://github.com/ahmy1996404/claudo",
+  "license": "MIT",
+  "keywords": ["theme", "look", "backdrop", "rain", "cafe", "cozy"]
+}
