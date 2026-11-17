@@ -1,6 +1,6 @@
 {
   "name": "claudo",
-  "description": "claudo, a cozy rainy cafe theme for the Claude desktop and mobile apps.",
+  "description": "claudo, a realistic deep space theme with a black hole for the Claude desktop and mobile apps.",
   "owner": { "name": "ahmy1996404" },
   "plugins": [{ "name": "claudo", "source": "./" }]
 }
